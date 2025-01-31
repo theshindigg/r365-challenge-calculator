@@ -1,8 +1,7 @@
 {
   "profiles": {
     "R365ChallengeCalculator": {
-      "commandName": "Project",
-      "commandLineArgs": "--delimiter \"\\n\""
+      "commandName": "Project"
     },
     "NegativeAllowed": {
       "commandName": "Project",
@@ -14,7 +13,7 @@
     },
     "Delimiter \\t": {
       "commandName": "Project",
-      "commandLineArgs": "--delimiter \"\\t\""
+      "commandLineArgs": "--delimiter '\\t'"
     },
     "Help": {
       "commandName": "Project",
@@ -23,6 +22,10 @@
     "UpperBound": {
       "commandName": "Project",
       "commandLineArgs": "-u 2000"
+    },
+    "NegativeUnset": {
+      "commandName": "Project",
+      "commandLineArgs": "-n"
     }
   }
 }
