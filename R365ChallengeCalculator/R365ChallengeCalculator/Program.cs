@@ -27,7 +27,7 @@ public class RootCliCommand
         }
         while (true)
         {
-            Console.WriteLine("\nEnter a list of numbers (comma-separated) or 'Ctrl+C' to quit:");
+            Console.WriteLine("\nEnter a formatted string to calculate or 'Ctrl+C' to quit:");
 
             string input = "";
             string? line;
