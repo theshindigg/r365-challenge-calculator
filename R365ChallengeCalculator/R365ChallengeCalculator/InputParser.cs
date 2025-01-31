@@ -9,14 +9,16 @@ namespace R365ChallengeCalculator
 {
     public static class InputParser
     {
-        public static List<int> ParseInputToNumbers(string? input)
+        public static List<int> ParseInputToNumbers(string? input, string altDelimiter = "\\n")
         {
             if (string.IsNullOrWhiteSpace(input))
             {
                 return new List<int>() { 0 };
             }
 
-            var numbers = input.Split(',');
+            var delimiters = new string[] { ",", altDelimiter };
+
+            var numbers = input.Split(delimiters, StringSplitOptions.TrimEntries);
 
             List<int> parsedNumbers = numbers.Select(ParseStringToInt).ToList();
 

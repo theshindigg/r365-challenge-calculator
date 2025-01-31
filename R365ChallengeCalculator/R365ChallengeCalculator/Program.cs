@@ -1,22 +1,42 @@
-﻿using R365ChallengeCalculator;
+﻿using DotMake.CommandLine;
+using R365ChallengeCalculator;
 
-Console.WriteLine($"Welcome to the calculator app! {args[0]}");
+var parseResult = Cli.Parse<RootCliCommand>(args);
+Cli.Run<RootCliCommand>(args);
 
-while (true)
+
+[CliCommand(Description = "A simple calculator app")]
+public class RootCliCommand
 {
-    Console.WriteLine("\nEnter up to 2 numbers (comma-separated) or 'Ctrl+C' to quit:");
-    var input = Console.ReadLine();
+    [CliOption(Description = "Alternate delimiter")]
+    public string? DelimiterOption { get; set; }
 
-    try
-    {
-        List<int> numbers = InputParser.ParseInputToNumbers(input);
-        string formula = InputParser.CreateFormulaFromNumbers(numbers);
+    [CliOption(Description = "Allow Negative Numbers")]
+    public bool NegativeNumbersAllowed { get; set; } = true;
 
-        var result = Calculator.Add(numbers);
-        Console.WriteLine($"Result: {formula} = {result}");
-    }
-    catch (ArgumentException ex)
+    public void Run()
     {
-        Console.WriteLine($"Error: {ex.Message}");
+        Console.WriteLine($"Welcome to the calculator app! ");
+        if (!string.IsNullOrWhiteSpace(DelimiterOption))
+        {
+            Console.WriteLine($"Alternate delimiter defined: {DelimiterOption}");
+        }
+        while (true)
+        {
+            Console.WriteLine("\nEnter a list of numbers (comma-separated) or 'Ctrl+C' to quit:");
+            var input = Console.ReadLine();
+            try
+            {
+                List<int> numbers = InputParser.ParseInputToNumbers(input, DelimiterOption ?? "\\n");
+                string formula = InputParser.CreateFormulaFromNumbers(numbers);
+                var result = Calculator.Add(numbers);
+                Console.WriteLine($"Result: {formula} = {result}");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
     }
 }
+
