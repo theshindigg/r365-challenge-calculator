@@ -9,13 +9,10 @@ while (true)
 
     try
     {
-        var numbers = InputParser.ParseInputToNumbers(input);
-        var formula = InputParser.CreateFormulaFromNumbers(numbers);
-        
-        var num1 = numbers.ElementAt(0);
-        var num2 = numbers.ElementAtOrDefault(1);
+        List<int> numbers = InputParser.ParseInputToNumbers(input);
+        string formula = InputParser.CreateFormulaFromNumbers(numbers);
 
-        var result = Calculator.Add(num1, num2);
+        var result = Calculator.Add(numbers);
         Console.WriteLine($"Result: {formula} = {result}");
     }
     catch (ArgumentException ex)

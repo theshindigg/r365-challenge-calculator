@@ -81,8 +81,11 @@ namespace R365ChallengeCalculator.Tests
             // Arrange
             string input = "5,10,15";
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => InputParser.ParseInputToNumbers(input));
+            // Act
+            List<int> result = InputParser.ParseInputToNumbers(input);
+
+            // Assert
+            Assert.Equal(new List<int> { 5, 10, 15}, result);
         }
 
         [Fact]

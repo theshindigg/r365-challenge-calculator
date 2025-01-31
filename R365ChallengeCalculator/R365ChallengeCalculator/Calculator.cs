@@ -2,24 +2,48 @@
 {
     public static class Calculator
     {
-        public static int Add(int num1, int? num2)
+        public static int Add(List<int> numbers)
         {
-            return num1 + (num2 ?? 0);
+            return numbers.Sum();
         }
 
-        public static int Subtract(int num1, int? num2)
+        public static int Subtract(List<int> numbers)
         {
-            return num1 - (num2 ?? 0);
+            var difference = numbers.ElementAt(0);
+            numbers.RemoveAt(0);
+
+            foreach (var number in numbers)
+            {
+                difference -= number;
+            }
+
+            return difference;
         }
 
-        public static int Multiply(int num1, int? num2)
+        public static int Multiply(List<int> numbers)
         {
-            return num1 * (num2 ?? 0);
+            int product = 1;
+
+            foreach (var number in numbers)
+            {
+                product *= number;
+            }
+
+            return product;
         }
 
-        public static int Divide(int num1, int? num2)
+        public static int Divide(List<int> numbers)
         {
-            return num1 / (num2 ?? 1);
+            int quotient = numbers.ElementAt(0);
+            numbers.RemoveAt(0);
+
+            foreach (var number in numbers)
+            {
+                quotient /= number;
+            }
+
+
+            return quotient;
         }
     }
 }

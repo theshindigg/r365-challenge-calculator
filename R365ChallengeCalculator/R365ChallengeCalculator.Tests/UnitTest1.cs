@@ -13,10 +13,7 @@ namespace R365ChallengeCalculator.Tests
 
             // Act
             List<int> numbers = InputParser.ParseInputToNumbers(input);
-
-            var num1 = numbers.ElementAt(0);
-            var num2 = numbers.ElementAtOrDefault(1);
-            int actual = Calculator.Add(num1, num2);
+            int actual = Calculator.Add(numbers);
 
             // Assert
             Assert.Equal(expected, actual);
