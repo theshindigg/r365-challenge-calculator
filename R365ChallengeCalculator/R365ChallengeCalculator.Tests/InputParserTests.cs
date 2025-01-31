@@ -17,7 +17,7 @@ namespace R365ChallengeCalculator.Tests
             string? input = null;
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 0 }, result);
@@ -30,7 +30,7 @@ namespace R365ChallengeCalculator.Tests
             string input = " ";
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 0 }, result);
@@ -43,7 +43,7 @@ namespace R365ChallengeCalculator.Tests
             string input = string.Empty;
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 0 }, result);
@@ -56,7 +56,7 @@ namespace R365ChallengeCalculator.Tests
             string input = "5";
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 5 }, result);
@@ -69,7 +69,7 @@ namespace R365ChallengeCalculator.Tests
             string input = "5,10";
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 5, 10 }, result);
@@ -82,7 +82,7 @@ namespace R365ChallengeCalculator.Tests
             string input = "5,10,15";
 
             // Act
-            List<int> result = InputParser.ParseNumbersStringToIntList(input, null, null, null);
+            List<int> result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 5, 10, 15}, result);

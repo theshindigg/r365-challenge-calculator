@@ -9,38 +9,83 @@ namespace R365ChallengeCalculator
 {
     public static class InputParser
     {
-        public static List<int> ParseInput(string? input, char delimiterOption, bool? negativeNumbersAllowed, int? maxValidValue)
+        public static List<int> ParseInput(string input, char delimiterOption, bool? negativeNumbersAllowed, int? maxValidValue)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
                 return new List<int>() { 0 };
             }
 
-            char[] delimiters = [',', delimiterOption];
+            List<string> delimiters = [",", delimiterOption.ToString()];
+            int newlineIndex = -1;
+
+            int inputFormat = ValidateInput(input, delimiterOption);
+            string numbersSection, delimitersSection = "";
 
             if (input.StartsWith("//"))
             {
-                var numbers = input.Substring(4);
-                char altDelimiter = input[3];
-                return ParseNumbersStringToIntList(numbers, altDelimiter, negativeNumbersAllowed, maxValidValue);
+                if (input[2] == '[')
+                {
+                    newlineIndex = input.IndexOf("]\n")+1;
+                    delimitersSection = input.Substring(2, newlineIndex - 2);
+                    numbersSection = input.Substring(newlineIndex+1);
+                    ExtractDelimitersFromInput(delimitersSection, delimiters);
+                    return ParseNumbersStringToIntList(numbersSection, delimiters, negativeNumbersAllowed, maxValidValue);
+                }
+                else
+                {
+                    delimiters.Add(input[2].ToString());
+                    numbersSection = input.Substring(4);
+                    return ParseNumbersStringToIntList(numbersSection, delimiters, negativeNumbersAllowed, maxValidValue);
+
+                }
             }
             else
             {
-                return ParseNumbersStringToIntList(input, delimiterOption, negativeNumbersAllowed, maxValidValue);
+                return ParseNumbersStringToIntList(input, delimiters, negativeNumbersAllowed, maxValidValue);
             }
 
         }
 
-        public static List<int> ParseNumbersStringToIntList(string? input, char? altDelimiter, bool? negativeNumbersAllowed, int? maxValidValue)
+        public static void ExtractDelimitersFromInput(string delimitersSection, List<string> delimiters)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            var matches = Regex.Matches(delimitersSection, @"\[(.*?)\]");
+            foreach (Match match in matches)
             {
-                return new List<int>() { 0 };
+                string delimiter = match.Groups[1].Value;
+
+                if (Regex.Match(delimiter, @"^[\d]+$").Success)
+                {
+                    throw new FormatException($"Digits cannot be used as a delimiter by themselves: {delimiter}");
+                }
+
+                if (!delimiters.Contains(delimiter))
+                {
+                    delimiters.Add(delimiter);
+                }
+            }
+        }
+
+        public static int ValidateInput(string input, char delimiterOption)
+        {
+            if (Regex.Match(delimiterOption.ToString(), @"^[\d]+$").Success)
+            {
+                throw new ArgumentException($"Digits cannot be used as a delimiter by themselves: {delimiterOption}");
             }
 
-            var delimiters = new char[] { ',', altDelimiter ?? '\n' };
 
-            var numbers = input.Split(delimiters, StringSplitOptions.TrimEntries);
+            if (Regex.IsMatch(input, @"^//(^\d)\n.+$"))
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static List<int> ParseNumbersStringToIntList(string input, List<string> delimiters, bool? negativeNumbersAllowed, int? maxValidValue)
+        {
+
+            var numbers = input.Split(delimiters.ToArray(), StringSplitOptions.None);
 
             List<int> parsedNumbers = numbers.Select((numberString) => ParseStringToInt(numberString, maxValidValue)).ToList();
 
