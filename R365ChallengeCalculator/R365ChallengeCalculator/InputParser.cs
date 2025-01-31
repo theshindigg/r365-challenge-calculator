@@ -27,7 +27,7 @@ namespace R365ChallengeCalculator
 
         public static int ParseStringToInt(string input)
         {
-            bool isValidNumber = int.TryParse(input.Trim(), out int result);
+            bool isValidNumber = int.TryParse(input.Trim(), out int result) && result <= 1000;
 
             return isValidNumber ? result : 0;
         }
