@@ -9,7 +9,7 @@ Cli.Run<RootCliCommand>(args);
 public class RootCliCommand
 {
     [CliOption(Description = "Alternate delimiter")]
-    public string? DelimiterOption { get; set; }
+    public string? DelimiterOption { get; set; } = null;
 
     [CliOption(Description = "Allow Negative Numbers")]
     public bool NegativeNumbersAllowed { get; set; } = true;
@@ -28,6 +28,12 @@ public class RootCliCommand
             try
             {
                 List<int> numbers = InputParser.ParseInputToNumbers(input, DelimiterOption ?? "\\n");
+                
+                if (!NegativeNumbersAllowed && numbers.Any(n => n < 0))
+                {
+                    var negativeNumbers = numbers.Where(n => n < 0).Select(n => n.ToString());
+                    throw new ArgumentException($"Negative numbers are currently not allowed: {string.Join(", ", negativeNumbers)}"); 
+                }
                 string formula = InputParser.CreateFormulaFromNumbers(numbers);
                 var result = Calculator.Add(numbers);
                 Console.WriteLine($"Result: {formula} = {result}");

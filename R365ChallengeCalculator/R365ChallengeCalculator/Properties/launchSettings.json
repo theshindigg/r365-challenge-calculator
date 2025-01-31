@@ -3,6 +3,26 @@
     "R365ChallengeCalculator": {
       "commandName": "Project",
       "commandLineArgs": "--delimiter \"\\n\""
+    },
+    "NegativeAllowed": {
+      "commandName": "Project",
+      "commandLineArgs": "-n true"
+    },
+    "NegativeDisallowed": {
+      "commandName": "Project",
+      "commandLineArgs": "-n false"
+    },
+    "Delimiter \\t": {
+      "commandName": "Project",
+      "commandLineArgs": "--delimiter \"\\t\""
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "-?"
+    },
+    "UpperBound": {
+      "commandName": "Project",
+      "commandLineArgs": "-u 2000"
     }
   }
 }
