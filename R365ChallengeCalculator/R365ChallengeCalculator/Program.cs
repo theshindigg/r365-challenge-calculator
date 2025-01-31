@@ -46,15 +46,9 @@ public class RootCliCommand
                 var result = Calculator.Add(numbers);
                 Console.WriteLine($"Result: {formula} = {result}");
             }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                Console.Write(ex.ToString());
-            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
-                Console.Write(ex.ToString());
             }
         }
     }

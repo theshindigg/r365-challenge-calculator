@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using R365ChallengeCalculator;
+using System.IO;
 using Xunit;
 
 namespace R365ChallengeCalculator.Tests
@@ -11,85 +8,207 @@ namespace R365ChallengeCalculator.Tests
     public class InputParserTests
     {
         [Fact]
-        public void ParseInputToNumbers_InputIsNull_ReturnsListWithZero()
+        public void ParseInput_DigitAsDelimiter_ThrowsArgumentException()
         {
             // Arrange
-            string? input = null;
+            string input = "1,2,3";
+            char delimiterOption = '1';
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => InputParser.ParseInput(input, delimiterOption, null, null));
+        }
+
+        [Fact]
+        public void ParseInput_EmptyInput_ReturnsZero()
+        {
+            // Arrange
+            string input = "";
+            char delimiterOption = '\n';
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 0 }, result);
         }
 
         [Fact]
-        public void ParseInputToNumbers_InputIsWhiteSpace_ReturnsListWithZero()
-        {
-            // Arrange
-            string input = " ";
-
-            // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
-
-            // Assert
-            Assert.Equal(new List<int> { 0 }, result);
-        }
-
-        [Fact]
-        public void ParseInputToNumbers_InputIsEmptyString_ReturnsListWithZero()
-        {
-            // Arrange
-            string input = string.Empty;
-
-            // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
-
-            // Assert
-            Assert.Equal(new List<int> { 0 }, result);
-        }
-
-        [Fact]
-        public void ParseInputToNumbers_InputIsSingleNumber_ReturnsListWithThatNumber()
+        public void ParseInput_SingleNumber_ReturnsNumber()
         {
             // Arrange
             string input = "5";
+            char delimiterOption = '\n';
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
 
             // Assert
             Assert.Equal(new List<int> { 5 }, result);
         }
 
         [Fact]
-        public void ParseInputToNumbers_InputIsTwoNumbers_ReturnsListWithThoseNumbers()
+        public void ParseInput_MultipleNumbers_ReturnsNumbers()
         {
             // Arrange
-            string input = "5,10";
+            string input = "1,2,3";
+            char delimiterOption = '\n';
 
             // Act
-            var result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
 
             // Assert
-            Assert.Equal(new List<int> { 5, 10 }, result);
+            Assert.Equal(new List<int> { 1, 2, 3 }, result);
         }
 
         [Fact]
-        public void ParseInputToNumbers_InputIsMoreThanTwoNumbers_ThrowsArgumentException()
+        public void ParseInput_NegativeNumbersNotAllowed_ThrowsInvalidDataException()
         {
             // Arrange
-            string input = "5,10,15";
+            string input = "1,-2,3";
+            char delimiterOption = '\n';
+            bool negativeNumbersAllowed = false;
 
-            // Act
-            List<int> result = InputParser.ParseNumbersStringToIntList(input, new List<string>() {",", "\n"}, null, null);
-
-            // Assert
-            Assert.Equal(new List<int> { 5, 10, 15}, result);
+            // Act & Assert
+            Assert.Throws<InvalidDataException>(() => InputParser.ParseInput(input, delimiterOption, negativeNumbersAllowed, null));
         }
 
         [Fact]
-        public void ParseStringToInt_InputIsValidNumber_ReturnsParsedNumber()
+        public void ParseInput_NegativeNumbersAllowed_ReturnsNumbers()
+        {
+            // Arrange
+            string input = "1,-2,3";
+            char delimiterOption = '\n';
+            bool negativeNumbersAllowed = true;
+
+            // Act
+            var result = InputParser.ParseInput(input, delimiterOption, negativeNumbersAllowed, null);
+
+            // Assert
+            Assert.Equal(new List<int> { 1, -2, 3 }, result);
+        }
+
+        [Fact]
+        public void ParseInput_MaxValidValue_ReturnsFilteredNumbers()
+        {
+            // Arrange
+            string input = "1,2,1000,1001";
+            char delimiterOption = '\n';
+            int maxValidValue = 1000;
+
+            // Act
+            var result = InputParser.ParseInput(input, delimiterOption, null, maxValidValue);
+
+            // Assert
+            Assert.Equal(new List<int> { 1, 2, 1000, 0 }, result);
+        }
+
+        [Fact]
+        public void ParseInput_CustomSingleCharDelimiter_ReturnsSum()
+        {
+            // Arrange
+            string input = "//#\n2#5";
+            char delimiterOption = '\t';
+
+            // Act
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
+
+            // Assert
+            Assert.Equal(new List<int> { 2, 5 }, result);
+        }
+
+        [Fact]
+        public void ParseInput_CustomSingleCharDelimiterWithComma_ReturnsSum()
+        {
+            // Arrange
+            string input = "//,\n2,ff,100";
+            char delimiterOption = '\t';
+
+            // Act
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
+
+            // Assert
+            Assert.Equal(new List<int> { 2, 0, 100 }, result);
+        }
+
+        [Fact]
+        public void ParseInput_MultipleDelimitersAnyLength_ReturnsParsedIntList()
+        {
+            // Arrange
+            string input = "//[*][!!][r9r]\n11r9r22*hh*33!!44";
+            char delimiterOption = ',';
+
+            // Act
+            var result = InputParser.ParseInput(input, delimiterOption, null, null);
+
+            // Assert
+            Assert.Equal(new List<int> { 11, 22, 0, 33, 44 }, result);
+        }
+
+        [Fact]
+        public void ParseInput_ContainedDelimiter_ThrowsFormatException()
+        {
+            // Arrange
+            string input = "//[***]\n11***22***33";
+            char delimiterOption = '*';
+            bool? negativeNumbersAllowed = null;
+            int? maxValidValue = null;
+
+            // Act & Assert
+            Assert.Throws<FormatException>(() => InputParser.ParseInput(input, delimiterOption, negativeNumbersAllowed, maxValidValue));
+        }
+
+        [Fact]
+        public void ExtractDelimitersFromInput_ValidDelimiters_AddsDelimiters()
+        {
+            // Arrange
+            string delimitersSection = "[;][***]";
+            List<string> delimiters = new List<string> { ",", "\n" };
+
+            // Act
+            InputParser.ExtractDelimitersFromInput(delimitersSection, delimiters);
+
+            // Assert
+            Assert.Equal(new List<string> { ",", "\n", ";", "***" }, delimiters);
+        }
+
+        [Fact]
+        public void ExtractDelimitersFromInput_DigitDelimiter_ThrowsFormatException()
+        {
+            // Arrange
+            string delimitersSection = "[1]";
+            List<string> delimiters = new List<string> { ",", "\n" };
+
+            // Act & Assert
+            Assert.Throws<FormatException>(() => InputParser.ExtractDelimitersFromInput(delimitersSection, delimiters));
+        }
+
+        [Fact]
+        public void ExtractDelimitersFromInput_ContainedDelimiters_ThrowsFormatException()
+        {
+            // Arrange
+            string delimitersSection = "[***][*]";
+            List<string> delimiters = new List<string> { "," };
+
+            // Act & Assert
+            Assert.Throws<FormatException>(() => InputParser.ExtractDelimitersFromInput(delimitersSection, delimiters));
+        }
+
+        [Fact]
+        public void ParseNumbersStringToIntList_ValidInput_ReturnsNumbers()
+        {
+            // Arrange
+            string input = "1,2,3";
+            List<string> delimiters = new List<string> { ",", "\n" };
+
+            // Act
+            var result = InputParser.ParseNumbersStringToIntList(input, delimiters, null, null);
+
+            // Assert
+            Assert.Equal(new List<int> { 1, 2, 3 }, result);
+        }
+
+        [Fact]
+        public void ParseStringToInt_ValidNumber_ReturnsNumber()
         {
             // Arrange
             string input = "5";
@@ -102,7 +221,7 @@ namespace R365ChallengeCalculator.Tests
         }
 
         [Fact]
-        public void ParseStringToInt_InputIsInvalidNumber_ReturnsZero()
+        public void ParseStringToInt_InvalidNumber_ReturnsZero()
         {
             // Arrange
             string input = "abc";
@@ -115,29 +234,16 @@ namespace R365ChallengeCalculator.Tests
         }
 
         [Fact]
-        public void CreateFormulaFromNumbers_InputIsSingleNumber_ReturnsThatNumberAsString()
+        public void CreateFormulaFromNumbers_ValidNumbers_ReturnsFormula()
         {
             // Arrange
-            var numbers = new List<int> { 5 };
+            List<int> numbers = new List<int> { 1, -2, 3 };
 
             // Act
             var result = InputParser.CreateFormulaFromNumbers(numbers);
 
             // Assert
-            Assert.Equal("5", result);
-        }
-
-        [Fact]
-        public void CreateFormulaFromNumbers_InputIsMultipleNumbers_ReturnsCorrectFormula()
-        {
-            // Arrange
-            var numbers = new List<int> { 5, -3, 10 };
-
-            // Act
-            var result = InputParser.CreateFormulaFromNumbers(numbers);
-
-            // Assert
-            Assert.Equal("5-3+10", result);
+            Assert.Equal("1-2+3", result);
         }
     }
 }

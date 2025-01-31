@@ -11,6 +11,11 @@ namespace R365ChallengeCalculator
     {
         public static List<int> ParseInput(string input, char delimiterOption, bool? negativeNumbersAllowed, int? maxValidValue)
         {
+            if (Regex.Match(delimiterOption.ToString(), @"^[\d]+$").Success)
+            {
+                throw new ArgumentException($"Digits cannot be used as a delimiter by themselves: {delimiterOption}");
+            }
+
             if (string.IsNullOrWhiteSpace(input))
             {
                 return new List<int>() { 0 };
@@ -19,7 +24,6 @@ namespace R365ChallengeCalculator
             List<string> delimiters = [",", delimiterOption.ToString()];
             int newlineIndex = -1;
 
-            int inputFormat = ValidateInput(input, delimiterOption);
             string numbersSection, delimitersSection = "";
 
             if (input.StartsWith("//"))
@@ -63,23 +67,18 @@ namespace R365ChallengeCalculator
                 {
                     delimiters.Add(delimiter);
                 }
+
+                for (int i = 0; i < delimiters.Count; i++)
+                {
+                    for (int j = i + 1; j < delimiters.Count; j++)
+                    {
+                        if (!string.Equals(delimiters[i],delimiters[j]) && (delimiters[i].Contains(delimiters[j]) || delimiters[j].Contains(delimiters[i])))
+                        {
+                            throw new FormatException($"Delimiters cannot be contained within each other: {delimiters[i]} and {delimiters[j]}");
+                        }
+                    }
+                }
             }
-        }
-
-        public static int ValidateInput(string input, char delimiterOption)
-        {
-            if (Regex.Match(delimiterOption.ToString(), @"^[\d]+$").Success)
-            {
-                throw new ArgumentException($"Digits cannot be used as a delimiter by themselves: {delimiterOption}");
-            }
-
-
-            if (Regex.IsMatch(input, @"^//(^\d)\n.+$"))
-            {
-                return 1;
-            }
-
-            return 0;
         }
 
         public static List<int> ParseNumbersStringToIntList(string input, List<string> delimiters, bool? negativeNumbersAllowed, int? maxValidValue)
@@ -92,7 +91,7 @@ namespace R365ChallengeCalculator
             if (negativeNumbersAllowed.HasValue && !negativeNumbersAllowed.Value && parsedNumbers.Any(n => n < 0))
             {
                 var negativeNumbers = parsedNumbers.Where(n => n < 0).Select(n => n.ToString());
-                throw new ArgumentException($"Negative numbers are currently not allowed: {string.Join(", ", negativeNumbers)}");
+                throw new InvalidDataException($"Negative numbers are currently not allowed: {string.Join(", ", negativeNumbers)}");
             }
 
             return parsedNumbers;
